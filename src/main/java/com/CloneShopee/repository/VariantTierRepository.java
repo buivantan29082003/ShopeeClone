@@ -13,10 +13,10 @@ public interface VariantTierRepository extends JpaRepository<VariantTier, Intege
     // =======================================================================================
 
     // GET COUNT VARIANTTIER CỦA PRODUCT
-    @Query("SELECT p from VariantTier p WHERE p.product.id=:productId")
+    @Query("SELECT p FROM VariantTier p WHERE p.product.id=:productId")
     public List<VariantTier> getVariantTierByProductId(@Param("productId") Integer id);
 
-    @Query("SELECT COUNT(p.id) from VariantTier p WHERE p in:varinatTier and p.product.id in:productId")
+    @Query("SELECT COUNT(p.id) FROM VariantTier p WHERE p IN :variantTier AND p.product.id =:productId")
     public Integer getCountVariantTierByProductId(@Param("variantTier") List<VariantTier> variantTier,
             @Param("productId") Integer productId);
 
@@ -27,6 +27,6 @@ public interface VariantTierRepository extends JpaRepository<VariantTier, Intege
 
     // DELETE=========================================================================================
     @Modifying
-    @Query("DELETE VariantTier p where p in :variantTiers")
+    @Query("DELETE VariantTier p WHERE p NOT IN :variantTiers")
     public void deleteVariantTierNotInList(@Param("variantTiers") List<VariantTier> variantTier);
 }

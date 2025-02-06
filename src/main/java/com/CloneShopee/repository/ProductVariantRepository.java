@@ -15,6 +15,6 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
 
     // DELETE=========================================================================================
     @Modifying
-    @Query("DELETE ProductVariant p where p in :productVariants")
+    @Query("DELETE ProductVariant p where p NOT IN :productVariants")
     public void deleteVariantTierNotInList(@Param("productVariants") List<ProductVariant> productVariants);
 }

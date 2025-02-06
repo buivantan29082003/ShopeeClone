@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cập nhật Sản phẩm</title>
+    <script>
+        function updateProduct() {
+            // Định nghĩa data cần gửi trong request
+            const data = {
+                "id": 169,
+                "productName": "Hasaky kem dưỡng ẩm",
+                "shop": {
+                    "id": 1,
+                    "shopName": "Thành Công",
+                    "discription": "Bán Mỹ Phẩm",
+                    "account": {
+                        "id": 1,
+                        "email": "buivantan29082003@gmail.com",
+                        "password": "1234",
+                        "fullName": "Bùi Văn Tấn",
+                        "phoneNumber": "0704872122",
+                        "gender": 1,
+                        "dateOfBirth": "2025-02-03T00:00:00.000+00:00",
+                        "status": 1,
+                        "role": 1
+                    },
+                    "phoneNumber": "0704872122",
+                    "fullName": "Bùi Văn Tấn",
+                    "image": null,
+                    "companyName": "Thành công Company",
+                    "reciveEmail": "buivantan29082003@gmail.com"
+                },
+                "discription": "Cấp ẩm toàn diện",
+                "productImage": "https://media.hcdn.vn/catalog/category/30_1_img_120x120_17b03c_fit_center.jpg",
+                "status": "1",
+                "video": null,
+                "brand": {
+                    "id": 1,
+                    "brandName": "Hasaki",
+                    "country": "Korea"
+                },
+                "category": {
+                    "id": 1,
+                    "categoryName": "Mỹ Phẩm"
+                },
+                "createdDate": "2025-02-01T17:00:00.000+00:00",
+                "minPrice": 200000.0,
+                "maxPrice": 300000.0,
+                "variantTiers": [
+                    {
+                        "id": 308,
+                        "valueList": "Cam-Vàng",
+                        "index": null,
+                        "variantTierName": "Màu Sắc"
+                    },
+                    {
+                        "id": 309,
+                        "valueList": "Tấn-Tạ",
+                        "index": null,
+                        "variantTierName": "Tỷ trọng"
+                    }
+                ],
+                "productVariants": [
+                    {
+                        "id": 580,
+                        "quantity": 11,
+                        "price": 200.0,
+                        "image": "wwww",
+                        "isActive": 1,
+                        "isDefault": 0,
+                        "index": "0-0",
+                        "variantName": "Cam-SL"
+                    },
+                    {
+                        "id": 581,
+                        "quantity": 11,
+                        "price": 200.0,
+                        "image": "wwww",
+                        "isActive": 1,
+                        "isDefault": 0,
+                        "index": "0-1",
+                        "variantName": "Cam-X"
+                    },
+                    {
+                        "id": 582,
+                        "quantity": 11,
+                        "price": 200.0,
+                        "image": "wwww",
+                        "isActive": 1,
+                        "isDefault": 0,
+                        "index": "1-0",
+                        "variantName": "Đỏ-SL"
+                    },
+                    {
+                        "id": 583,
+                        "quantity": 11,
+                        "price": 500000000.0,
+                        "image": "wwww",
+                        "isActive": 1,
+                        "isDefault": 0,
+                        "index": "1-1",
+                        "variantName": "Đỏ-X"
+                    }
+                ],
+                "properties": [
+                    {
+                        "id": 278,
+                        "property": {
+                            "id": 1
+                        },
+                        "propertyValue": {
+                            "id": 2,
+                            "propertyValue": "Da dầu"
+                        }
+                    }
+                ],
+                "productImages": [
+                    {
+                        "id": 112,
+                        "imageLink": "wwwww"
+                    }
+                ]
+            };
+
+            // Lấy nút button và thay đổi nội dung thành "Loading..."
+            const button = document.getElementById('updateButton');
+            button.disabled = true;  // Disable nút trong quá trình gửi yêu cầu
+            button.innerHTML = 'Loading...';
+
+            // Gọi API bằng fetch
+            fetch('http://localhost:8080/sale/product/update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return Promise.reject('Có lỗi xảy ra: ' + response.status);
+                }
+                return response.data;  // Chuyển đổi thành JSON
+            })
+            .then(data => {
+                button.innerHTML = 'Update successfully'; 
+                button.disabled = false;  // Bật lại nút
+            })
+            .catch(error => {
+                console.error('Lỗi khi cập nhật:', error);
+                alert('Đã xảy ra lỗi khi cập nhật sản phẩm: ' + error);
+                button.innerHTML = 'Cập nhật Sản phẩm';  // Đổi lại nội dung nút
+                button.disabled = false;  // Bật lại nút
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Cập nhật Sản phẩm</h1>
+    <button id="updateButton" onclick="updateProduct()">Cập nhật Sản phẩm</button>
+</body>
+</html>

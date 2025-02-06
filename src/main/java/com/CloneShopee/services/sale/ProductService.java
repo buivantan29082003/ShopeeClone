@@ -34,9 +34,6 @@ import com.CloneShopee.repository.VariantTierRepository;
 @Service
 public class ProductService {
 	@Autowired
-	ProductInfoMapper productMapper;
-
-	@Autowired
 	ProductRepository productRepo;
 	@Autowired
 	PropertyRepository propertyRepo;
@@ -57,10 +54,6 @@ public class ProductService {
 		return productRepo.findById(id).orElse(null);
 	}
 
-	public void checkProperyOfProduct(List<Integer> propertyId) {
-
-	}
-
 	public void updateProperties(Product product, List<PropertyItem> propertyItems, Integer categoryOld) {
 		if (propertyItems == null || propertyItems.isEmpty()) {
 			return;
@@ -79,41 +72,52 @@ public class ProductService {
 			deleteAllPropertyByProductId(product.getId());
 			checkProperties(propertyItems, product);
 		}
+		propertyItems.forEach(v -> {
+			v.setProduct(product);
+		});
+		propertyItemRepo.saveAll(propertyItems);
 	}
 
 	public void updateVariantTier(List<VariantTier> variantTiers, List<ProductVariant> productVariants,
-			Product product,Boolean isChange) { 
-		if(isChange) {
-			List<Integer> ids = variantTiers.stream()
-					.map(VariantTier::getId)
-					.filter(id -> id != null)
-					.collect(Collectors.toList());
-			
-		}
-	}
-	
-	
-	public Integer countIdNullOfListVariant(List<VariantTier> variantTier) {
-		Integer count=0;
-		for (VariantTier variantTier2 : variantTier) {
-			if(variantTier2.getId()==null) {
-				count++;
+			Product product, boolean t) {
+		Integer countVariantTier = variantTierRepo.getCountVariantTierByProductId(
+				variantTiers.stream().filter((v -> v.getId() != null)).toList(), product.getId());
+		Integer countIdNotNull = 0;
+		for (VariantTier v : variantTiers) {
+			if (v.getId() != null) {
+				countIdNotNull++;
 			}
 		}
-		return count;
+		if (countVariantTier == countIdNotNull) {
+			countIdNotNull = 0;
+			Integer countProductVariant = productVariantRepo.getCountProductVariantByProductId(
+					productVariants.stream().filter((v -> v.getId() != null)).toList(),
+					product.getId());
+			for (ProductVariant v : productVariants) {
+				if (v.getId() != null) {
+					countIdNotNull++;
+				}
+			}
+			if (countProductVariant == countIdNotNull) {
+				checkVariant(variantTiers, productVariants, product);
+				variantTierRepo.saveAll(variantTiers);
+				productVariantRepo.saveAll(productVariants);
+				variantTierRepo.deleteVariantTierNotInList(variantTiers);
+				productVariantRepo.deleteVariantTierNotInList(productVariants);
+			} else {
+				throw new ConstraintException("productVariants", "productVariants update not valid");
+			}
+		} else {
+			throw new ConstraintException("variantTiers", "Variant update not valid");
+		}
 	}
 
 	public void updateProduct(Product product) {
 		productRepo.save(product);
-		propertyItemRepo.saveAll(product.getProperties());
 	}
 
 	public void deleteAllPropertyByProductId(Integer productId) {
 		propertyItemRepo.deleteAllPropertyByProductId(productId);
-	}
-
-	public void updateVariantTiers(List<VariantTier> variantTiers, List<ProductVariant> productVariant) {
-
 	}
 
 	public void checkProperties(List<PropertyItem> propertyItems, Product p) {
@@ -178,6 +182,7 @@ public class ProductService {
 	public void generateVariantSingle(String[] variantValues, List<ProductVariant> productVariants)
 			throws ConstraintException {
 		ProductVariant p;
+
 		if (variantValues.length == productVariants.size()) {
 			for (int i = 0; i < variantValues.length; i++) {
 				p = productVariants.get(i);
@@ -191,6 +196,7 @@ public class ProductService {
 
 	public void generateVariantNotSingle(String[] variantValue1, String[] variantValue2,
 			List<ProductVariant> productVariants) throws ConstraintException {
+
 		ProductVariant p;
 		int index = variantValue2.length;
 		if (variantValue1.length * variantValue2.length == productVariants.size()) {

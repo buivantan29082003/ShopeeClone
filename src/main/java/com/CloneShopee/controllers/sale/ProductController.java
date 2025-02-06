@@ -24,7 +24,7 @@ public class ProductController {
 
 	@GetMapping("/hello")
 	public ResponseEntity<Object> getProduct() {
-		return new ResponseEntity<Object>(productService.getProductById(1), HttpStatus.OK);
+		return new ResponseEntity<Object>(productService.getProductById(169), HttpStatus.OK);
 	}
 
 	@Transactional
