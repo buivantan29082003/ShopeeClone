@@ -35,7 +35,7 @@ import com.CloneShopee.repository.VariantTierRepository;
 public class ProductService {
 	@Autowired
 	ProductInfoMapper productMapper;
-	
+
 	@Autowired
 	ProductRepository productRepo;
 	@Autowired
@@ -52,170 +52,176 @@ public class ProductService {
 	PropertyItemsRepository propertyItemRepo;
 	@Autowired
 	ProductImagesReopository productImagesRepo;
- 
+
 	public Product getProductById(Integer id) {
 		return productRepo.findById(id).orElse(null);
 	}
-	
-	
-	public void updateProperties(Product product, List<PropertyItem> propertyItems, Integer categoryOld) {
-	    if (propertyItems == null || propertyItems.isEmpty()) {
-	        return;
-	    }
-	    
-	    if (categoryOld.equals(product.getCategory().getId())) {
-	        List<Integer> propertyIds = propertyItems.stream()
-	            .map(item -> item.getProperty().getId())
-	            .collect(Collectors.toList());
-	        List<PropertyItem> properties = propertyItemRepo.getPropertyItemInList(product.getId());
-	        List<Property> propertiesCheck = propertyRepo.getPropertyInList(propertyIds);
-	        Map<Integer, PropertyItem> propertyMap = properties.stream().collect(Collectors.toMap(PropertyItem::getId, Function.identity()));
-	        Map<Integer, String> propertyMapCheck = propertiesCheck.stream().collect(Collectors.toMap(Property::getId, Property::getHashValue));
-	        PropertyItem existingProperty;
-	        String existingProNew;
-	        propertyMap.forEach((v,k)->{
-	        	System.out.println(k);
-	        });
-	        for (PropertyItem v : propertyItems) {
-            	existingProNew=propertyMapCheck.get(v.getProperty().getId());
-	            existingProperty = propertyMap.get(v.getId());
-	            if (existingProperty != null) { 
-	                v.setProduct(product);
-	            } else {
-	            	
-	            	if(existingProNew!=null&&existingProNew.contains("-"+v.getPropertyValue().getId()+"-")) {
-	    				v.setProduct(product);
-	    				v.setId(null);
-	    			}else {
-	    				throw new IntegrationException("Property and value not match");
 
-	    			}
-	            }
-	        }
-	    } else {
-	        deleteAllPropertyByProductId(product.getId());
-	        checkProperties(propertyItems, product);
-	    }
-	 
+	public void checkProperyOfProduct(List<Integer> propertyId) {
+
+	}
+
+	public void updateProperties(Product product, List<PropertyItem> propertyItems, Integer categoryOld) {
+		if (propertyItems == null || propertyItems.isEmpty()) {
+			return;
+		}
+		if (categoryOld.equals(product.getCategory().getId())) {
+			checkProperties(propertyItems, product);
+			List<Integer> ids = propertyItems.stream()
+					.map(PropertyItem::getId)
+					.filter(id -> id != null)
+					.collect(Collectors.toList());
+			Integer countPropertyCheck = propertyItemRepo.countPropertyByProductId(product.getId(), ids);
+			if (countPropertyCheck != ids.size()) {
+				throw new RuntimeException("Property update Item not match");
+			}
+		} else {
+			deleteAllPropertyByProductId(product.getId());
+			checkProperties(propertyItems, product);
+		}
+	}
+
+	public void updateVariantTier(List<VariantTier> variantTiers, List<ProductVariant> productVariants,
+			Product product,Boolean isChange) { 
+		if(isChange) {
+			List<Integer> ids = variantTiers.stream()
+					.map(VariantTier::getId)
+					.filter(id -> id != null)
+					.collect(Collectors.toList());
+			
+		}
 	}
 	
+	
+	public Integer countIdNullOfListVariant(List<VariantTier> variantTier) {
+		Integer count=0;
+		for (VariantTier variantTier2 : variantTier) {
+			if(variantTier2.getId()==null) {
+				count++;
+			}
+		}
+		return count;
+	}
+
 	public void updateProduct(Product product) {
 		productRepo.save(product);
 		propertyItemRepo.saveAll(product.getProperties());
 	}
 
-	
 	public void deleteAllPropertyByProductId(Integer productId) {
 		propertyItemRepo.deleteAllPropertyByProductId(productId);
 	}
-	
-	public void updateVariantTiers(List<VariantTier>variantTiers,List<ProductVariant> productVariant) {
-		
+
+	public void updateVariantTiers(List<VariantTier> variantTiers, List<ProductVariant> productVariant) {
+
 	}
-	
-	public void checkProperties(List<PropertyItem> propertyItems,Product p) {
+
+	public void checkProperties(List<PropertyItem> propertyItems, Product p) {
 		List<Integer> propertyIds = propertyItems.stream()
-                .map(item -> item.getProperty().getId())
-                .collect(Collectors.toList()); 
-		List<Property> properties=propertyRepo.getPropertyInList(propertyIds); 
-		Map<Integer, String> propertyMap = properties.stream() .collect(Collectors.toMap(Property::getId, Property::getHashValue));
-		propertyItems.forEach(v->{
-			String value=propertyMap.get(v.getProperty().getId());
-			if(value!=null&&value.contains("-"+v.getPropertyValue().getId()+"-")) {
+				.map(item -> item.getProperty().getId())
+				.collect(Collectors.toList());
+		List<Property> properties = propertyRepo.getPropertyInList(propertyIds);
+		Map<Integer, String> propertyMap = properties.stream()
+				.collect(Collectors.toMap(Property::getId, Property::getHashValue));
+		propertyItems.forEach(v -> {
+			String value = propertyMap.get(v.getProperty().getId());
+			if (value != null && value.contains("-" + v.getPropertyValue().getId() + "-")) {
 				v.setProduct(p);
-			}else { 
+			} else {
 				throw new IntegrationException("Property and value not match");
 			}
 		});
 	}
-	
-	
-	
+
 	public void checkBrand(Integer id) throws ConstraintException {
-		if(brandRepo.findById(id).orElse(null)==null) {
-			throw new ConstraintException("brand","Brand your choose is not valid");
+		if (brandRepo.findById(id).orElse(null) == null) {
+			throw new ConstraintException("brand", "Brand your choose is not valid");
 		}
 	}
-	
+
 	public void saveProduct(Product product) {
 		productRepo.save(product);
 		propertyItemRepo.saveAll(product.getProperties());
 		variantTierRepo.saveAll(product.getVariantTiers());
 		productVariantRepo.saveAll(product.getProductVariants());
-		product.getProductImages().forEach(v->v.setProduct(product));
+		product.getProductImages().forEach(v -> v.setProduct(product));
 		productImagesRepo.saveAll(product.getProductImages());
 	}
-	
+
 	public void checkCategory(Integer id) throws ConstraintException {
-		if(categoryRepo.findById(id).orElse(null)==null) {
-			throw new ConstraintException("category","Category your choose is not valid");
+		if (categoryRepo.findById(id).orElse(null) == null) {
+			throw new ConstraintException("category", "Category your choose is not valid");
 		}
 	}
-	
-	public void checkVariant(List<VariantTier> variantTiers, List<ProductVariant> productVariant,Product product) throws ConstraintException     {
-		if(variantTiers.size()==1) {
-			if(productVariant.get(0).getIsDefault()==1) {
+
+	public void checkVariant(List<VariantTier> variantTiers, List<ProductVariant> productVariant, Product product)
+			throws ConstraintException {
+		if (variantTiers.size() == 1) {
+			if (productVariant.get(0).getIsDefault() == 1) {
 				productVariant.get(0).setVariantName("");
 				productVariant.get(0).setIndex("0-0");
 				return;
 			}
 			generateVariantSingle(variantTiers.get(0).getValueList().split("-"), productVariant);
-		}else {
-			generateVariantNotSingle(variantTiers.get(0).getValueList().split("-"),variantTiers.get(1).getValueList().split("-"), productVariant);
-		} 
-		productVariant.forEach(v->{
+		} else {
+			generateVariantNotSingle(variantTiers.get(0).getValueList().split("-"),
+					variantTiers.get(1).getValueList().split("-"), productVariant);
+		}
+		productVariant.forEach(v -> {
 			v.setProduct(product);
 		});
-		variantTiers.forEach(v->{
+		variantTiers.forEach(v -> {
 			v.setProduct(product);
 		});
 	}
-	
-	public void generateVariantSingle(String [] variantValues,List<ProductVariant> productVariants) throws ConstraintException {
-		ProductVariant p; 
-		if(variantValues.length==productVariants.size()) {
+
+	public void generateVariantSingle(String[] variantValues, List<ProductVariant> productVariants)
+			throws ConstraintException {
+		ProductVariant p;
+		if (variantValues.length == productVariants.size()) {
 			for (int i = 0; i < variantValues.length; i++) {
-				p=productVariants.get(i);
+				p = productVariants.get(i);
 				p.setVariantName(variantValues[i]);
-				p.setIndex(i+"-"+0);
+				p.setIndex(i + "-" + 0);
 			}
-		}else {
-			throw new ConstraintException("variantiers","Not match variantTier with productVariant");
+		} else {
+			throw new ConstraintException("variantiers", "Not match variantTier with productVariant");
 		}
 	}
-	
-	public void generateVariantNotSingle(String [] variantValue1,String [] variantValue2, List<ProductVariant> productVariants) throws ConstraintException {
+
+	public void generateVariantNotSingle(String[] variantValue1, String[] variantValue2,
+			List<ProductVariant> productVariants) throws ConstraintException {
 		ProductVariant p;
-		int index=variantValue2.length;  
-		if(variantValue1.length*variantValue2.length==productVariants.size()) {
+		int index = variantValue2.length;
+		if (variantValue1.length * variantValue2.length == productVariants.size()) {
 			for (int i = 0; i < variantValue1.length; i++) {
-				for (int k = 0; k <variantValue2.length; k++) { 
-					p=productVariants.get(i*index+k); 
-					p.setVariantName(variantValue1[i]+"-"+variantValue2[k]);  
-					p.setIndex(i+"-"+k); 
+				for (int k = 0; k < variantValue2.length; k++) {
+					p = productVariants.get(i * index + k);
+					p.setVariantName(variantValue1[i] + "-" + variantValue2[k]);
+					p.setIndex(i + "-" + k);
 				}
-			} 
-		}else {
-			throw new ConstraintException("variantiers","Not match variantTier with productVariant");
-		}  
+			}
+		} else {
+			throw new ConstraintException("variantiers", "Not match variantTier with productVariant");
+		}
 	}
-	
-	public void generatevariant(String [] variantValue1,String [] variantValue2,List<ProductVariant> productVariants,String format) { 
+
+	public void generatevariant(String[] variantValue1, String[] variantValue2, List<ProductVariant> productVariants,
+			String format) {
 		ProductVariant p;
-		if(productVariants.size()==1&& productVariants.get(0).getIsDefault()==1) {
+		if (productVariants.size() == 1 && productVariants.get(0).getIsDefault() == 1) {
 			productVariants.get(0).setVariantName("");
 			productVariants.get(0).setIndex("0-0");
 			return;
 		}
-		Integer lenght=variantValue2.length;  
-		for (int i = 0; i < variantValue1.length; i++) {  
-			for (int k = 0; k < variantValue2.length; k++) { 
-				p=productVariants.get(i*lenght+k); 
-				p.setIndex(i+"-"+k); 
-				p.setVariantName(variantValue1[i]+""+(format+variantValue2[k]));
+		Integer lenght = variantValue2.length;
+		for (int i = 0; i < variantValue1.length; i++) {
+			for (int k = 0; k < variantValue2.length; k++) {
+				p = productVariants.get(i * lenght + k);
+				p.setIndex(i + "-" + k);
+				p.setVariantName(variantValue1[i] + "" + (format + variantValue2[k]));
 			}
-		} 
+		}
 	}
 
-	
 }
