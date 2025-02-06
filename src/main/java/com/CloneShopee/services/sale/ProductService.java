@@ -1,22 +1,12 @@
 package com.CloneShopee.services.sale;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import org.hibernate.boot.beanvalidation.IntegrationException;
-import org.mapstruct.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-
-import com.CloneShopee.DTO.Sale.product.ProductInfo;
 import com.CloneShopee.ExceptionGlobal.ConstraintException;
-import com.CloneShopee.mapper.sale.productMapper.ProductInfoMapper;
 import com.CloneShopee.models.Product;
 import com.CloneShopee.models.ProductVariant;
 import com.CloneShopee.models.Property;
