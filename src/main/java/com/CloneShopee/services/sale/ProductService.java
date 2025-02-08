@@ -1,11 +1,17 @@
 package com.CloneShopee.services.sale;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.hibernate.boot.beanvalidation.IntegrationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PutMapping;
+
+import com.CloneShopee.DTO.Sale.product.ProductInfo;
 import com.CloneShopee.ExceptionGlobal.ConstraintException;
 import com.CloneShopee.models.Product;
 import com.CloneShopee.models.ProductVariant;
@@ -20,6 +26,7 @@ import com.CloneShopee.repository.ProductVariantRepository;
 import com.CloneShopee.repository.PropertyItemsRepository;
 import com.CloneShopee.repository.PropertyRepository;
 import com.CloneShopee.repository.VariantTierRepository;
+import com.CloneShopee.repository.SpecificationBuilder.ProductSpecification;
 
 @Service
 public class ProductService {
@@ -40,8 +47,36 @@ public class ProductService {
 	@Autowired
 	ProductImagesReopository productImagesRepo;
 
+	private final Map<String, Integer> statusProduct = new HashMap<>(Map.of(
+			"ACTIVE", 1,
+			"HIDDEN", 0,
+			"DELETE", 2));
+
 	public Product getProductById(Integer id) {
 		return productRepo.findById(id).orElse(null);
+	}
+
+	public List<ProductInfo> findProducts(String name, List<Integer> categoryIds, String status) {
+
+		Specification<Product> spec = ProductSpecification.filterProducts(name, categoryIds, statusProduct.get(status));
+		List<Product> products = productRepo.findAllProducts(spec);
+		List<ProductInfo> productInfoList = products.stream()
+				.map(ProductInfo::new) // Gọi constructor của ProductInfo
+				.toList();
+
+		return productInfoList;
+	}
+
+	public void updateStatusProduct(String status, Integer productId, Integer shopId) {
+		if (statusProduct.get(status) != null) {
+			Integer product = productRepo.getIdProductByProductIdAndShopId(productId, shopId);
+			if (product != null) {
+				productRepo.updateStatusByProductId(productId, statusProduct.get(status));
+			} else {
+				throw new ConstraintException("product", "Product not of shop !!!");
+			}
+		}
+		throw new ConstraintException("status", "Status change is not valid !!!");
 	}
 
 	public void updateProperties(Product product, List<PropertyItem> propertyItems, Integer categoryOld) {

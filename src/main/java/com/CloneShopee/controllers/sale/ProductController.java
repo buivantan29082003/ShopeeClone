@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @CrossOrigin("*")
@@ -22,9 +23,19 @@ public class ProductController {
 	@Autowired
 	ProductService productService;
 
-	@GetMapping("/hello")
-	public ResponseEntity<Object> getProduct() {
-		return new ResponseEntity<Object>(productService.getProductById(169), HttpStatus.OK);
+	@GetMapping("/sale/product/findall")
+	public ResponseEntity<Object> getProduct(@RequestParam(name = "productName", required = false) String productName,
+			@RequestParam(name = "status", required = false) String status) {
+		return new ResponseEntity<Object>(
+				productService.findProducts(productName, null), HttpStatus.OK);
+	}
+
+	@Transactional
+	@PutMapping("/sale/product/update/status")
+	public ResponseEntity<Object> updateStatusProduct(@RequestParam("status") String status,
+			@RequestParam("productId") Integer productId) {
+		productService.updateStatusProduct(status, productId, 1);
+		return new ResponseEntity<Object>("Update product success", HttpStatus.OK);
 	}
 
 	@Transactional
