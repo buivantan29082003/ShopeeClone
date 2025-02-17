@@ -27,7 +27,7 @@ public class ProductController {
 	public ResponseEntity<Object> getProduct(@RequestParam(name = "productName", required = false) String productName,
 			@RequestParam(name = "status", required = false) String status) {
 		return new ResponseEntity<Object>(
-				productService.findProducts(productName, null), HttpStatus.OK);
+				productService.findProducts(productName, null, status), HttpStatus.OK);
 	}
 
 	@Transactional
@@ -57,6 +57,11 @@ public class ProductController {
 		product.setShop(new Shop(1));
 		productService.saveProduct(product);
 		return new ResponseEntity<Object>(product.getId(), HttpStatus.OK);
+	}
+
+	@GetMapping("/sale/hello")
+	public ResponseEntity<Object> getProductById() {
+		return new ResponseEntity<>(productService.getProductById(172), HttpStatus.OK);
 	}
 
 }

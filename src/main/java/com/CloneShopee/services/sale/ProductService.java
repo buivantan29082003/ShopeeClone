@@ -1,6 +1,7 @@
 package com.CloneShopee.services.sale;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PutMapping;
-
 import com.CloneShopee.DTO.Sale.product.ProductInfo;
 import com.CloneShopee.ExceptionGlobal.ConstraintException;
 import com.CloneShopee.models.Product;
 import com.CloneShopee.models.ProductVariant;
+import com.CloneShopee.models.PromotionItem;
 import com.CloneShopee.models.Property;
 import com.CloneShopee.models.PropertyItem;
 import com.CloneShopee.models.VariantTier;
@@ -23,6 +24,7 @@ import com.CloneShopee.repository.Categoryrepository;
 import com.CloneShopee.repository.ProductImagesReopository;
 import com.CloneShopee.repository.ProductRepository;
 import com.CloneShopee.repository.ProductVariantRepository;
+import com.CloneShopee.repository.PromotionRepository;
 import com.CloneShopee.repository.PropertyItemsRepository;
 import com.CloneShopee.repository.PropertyRepository;
 import com.CloneShopee.repository.VariantTierRepository;
@@ -46,6 +48,8 @@ public class ProductService {
 	PropertyItemsRepository propertyItemRepo;
 	@Autowired
 	ProductImagesReopository productImagesRepo;
+	@Autowired
+	PromotionRepository promotionRepo;
 
 	private final Map<String, Integer> statusProduct = new HashMap<>(Map.of(
 			"ACTIVE", 1,
@@ -57,13 +61,10 @@ public class ProductService {
 	}
 
 	public List<ProductInfo> findProducts(String name, List<Integer> categoryIds, String status) {
-
-		Specification<Product> spec = ProductSpecification.filterProducts(name, categoryIds, statusProduct.get(status));
-		List<Product> products = productRepo.findAllProducts(spec);
-		List<ProductInfo> productInfoList = products.stream()
-				.map(ProductInfo::new) // Gọi constructor của ProductInfo
-				.toList();
-
+		Specification<Product> spec = ProductSpecification.filterProductsWithJoinfetch(name, categoryIds,
+				statusProduct.get(status));
+		List<Product> products = productRepo.findAll(spec);
+		List<ProductInfo> productInfoList = products.stream().map(ProductInfo::new).toList();
 		return productInfoList;
 	}
 

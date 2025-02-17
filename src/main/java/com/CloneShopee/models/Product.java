@@ -57,15 +57,29 @@ public class Product {
 		return productVariants;
 	}
 
-	public void setProductVariants(List<ProductVariant> productVariants) {
-		this.productVariants = productVariants;
-	}
-
 	@OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
 	private List<ProductVariant> productVariants;
 
 	@OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
 	private List<PropertyItem> properties;
+
+	@OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+	private List<PromotionItem> promotionItems;
+
+	// CONSTRUCTORS
+	public Product() {
+
+	}
+
+	public Product(Integer id) {
+		this.id = id;
+	}
+
+	// GETTERS/ SETTERS
+
+	public void setProductVariants(List<ProductVariant> productVariants) {
+		this.productVariants = productVariants;
+	}
 
 	public List<PropertyItem> getProperties() {
 		return properties;
@@ -188,5 +202,13 @@ public class Product {
 
 	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
+	}
+
+	public List<PromotionItem> getPromotionItems() {
+		return promotionItems;
+	}
+
+	public void setPromotionItems(List<PromotionItem> promotionItems) {
+		this.promotionItems = promotionItems;
 	}
 }
