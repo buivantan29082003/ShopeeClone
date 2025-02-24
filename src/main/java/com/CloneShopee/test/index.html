@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -158,5 +158,38 @@
 <body>
     <h1>Cập nhật Sản phẩm</h1>
     <button id="updateButton" onclick="updateProduct()">Cập nhật Sản phẩm</button>
+</body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thử nghiệm API</title>
+</head>
+<body>
+
+    <h2>Test API Change Variant</h2>
+    <button onclick="callApi()">Gửi Request</button>
+
+    <script>
+        function callApi() {
+            const url = "http://localhost:8080/user/cart/changevariant?productId=580&idChange=581&idProduct=169";
+            
+            fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json()) 
+            .then(data => alert("Response: " + JSON.stringify(data))) 
+            .catch(error => alert("Lỗi: " + error));
+        }
+    </script>
+
 </body>
 </html>

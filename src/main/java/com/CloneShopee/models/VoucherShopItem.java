@@ -17,11 +17,11 @@ public class VoucherShopItem {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne()
 	@JsonIgnore
 	@JoinColumn(name = "voucherId")
 	private VoucherShop voucherShop;
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne()
 	@JsonIgnore
 	@JoinColumn(name = "productId")
 	private Product product;

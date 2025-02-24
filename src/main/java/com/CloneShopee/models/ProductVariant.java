@@ -19,69 +19,86 @@ public class ProductVariant {
 	private Integer id;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonIgnore
-    @JoinColumn(name = "productId")
+	@JoinColumn(name = "productId")
 	private Product product;
-	private String VariantName;
+	private String variantName;
 	private Integer quantity;
 	private Double price;
 	private String image;
 	private Integer isActive;
-	private Integer isDefault; 
+	private Integer isDefault;
 	private String indexVariant;
- 
+
 	public String getIndex() {
 		return indexVariant;
 	}
+
 	public void setIndex(String index) {
 		this.indexVariant = index;
 	}
+
 	public Integer getId() {
 		return id;
 	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
 	public Product getProduct() {
 		return product;
 	}
+
 	public void setProduct(Product product) {
 		this.product = product;
 	}
+
 	public String getVariantName() {
-		return VariantName;
+		return variantName;
 	}
+
 	public void setVariantName(String variantName) {
-		VariantName = variantName;
+		variantName = variantName;
 	}
+
 	public Integer getQuantity() {
 		return quantity;
 	}
+
 	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
 	}
+
 	public Double getPrice() {
 		return price;
 	}
+
 	public void setPrice(Double price) {
 		this.price = price;
 	}
+
 	public String getImage() {
 		return image;
 	}
+
 	public void setImage(String image) {
 		this.image = image;
 	}
+
 	public Integer getIsActive() {
 		return isActive;
 	}
+
 	public void setIsActive(Integer isActive) {
 		this.isActive = isActive;
 	}
+
 	public Integer getIsDefault() {
 		return isDefault;
 	}
+
 	public void setIsDefault(Integer isDefault) {
 		this.isDefault = isDefault;
 	}
-	
+
 }

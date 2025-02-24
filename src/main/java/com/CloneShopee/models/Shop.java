@@ -1,5 +1,6 @@
 package com.CloneShopee.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Entity;
@@ -21,6 +22,7 @@ public class Shop {
 	private String shopName;
 	private String discription;
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JsonIgnore
 	@JoinColumn(name = "accountId")
 	private Account account;
 	private String phoneNumber;

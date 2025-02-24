@@ -28,7 +28,7 @@ public class Promotion {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JsonIgnore
+	// @JsonIgnore
 	@JoinColumn(name = "shopId")
 	private Shop shop;
 	private String PromotionName;
@@ -38,6 +38,7 @@ public class Promotion {
 	private Integer isActive;
 	private Date createdDate;
 	private String promotionType;
+	@JsonIgnore
 	@OneToMany(mappedBy = "promotion", cascade = CascadeType.REMOVE)
 	private List<PromotionItem> promotionItems;
 

@@ -1,49 +1,70 @@
 package com.CloneShopee.models;
 
-import jakarta.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
 @Entity
 @Table(name = "CartItem")
 public class CartItem {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
-	@ManyToOne
-	@JoinColumn(name = "productId")
+	@JsonIgnore
+	@EmbeddedId
+	private CartDetailId id;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "productId", insertable = false, updatable = false)
 	private ProductVariant product;
-	@ManyToOne
-	@JoinColumn(name = "accountId")
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JsonIgnore
+	@JoinColumn(name = "accountId", insertable = false, updatable = false)
 	private Account account;
 	private Integer quantity;
-	public Integer getId() {
-		return id;
+
+	public CartItem() {
+
 	}
-	public void setId(Integer id) {
-		this.id = id;
+
+	public CartItem(Integer accountId, Integer productId, Integer quantity) {
+		this.quantity = quantity;
+		this.setId(new CartDetailId(productId, accountId));
 	}
+
 	public ProductVariant getProduct() {
 		return product;
 	}
+
 	public void setProduct(ProductVariant product) {
 		this.product = product;
 	}
+
 	public Account getAccount() {
 		return account;
 	}
+
 	public void setAccount(Account account) {
 		this.account = account;
 	}
+
 	public Integer getQuantity() {
 		return quantity;
 	}
+
 	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
 	}
-	
+
+	public CartDetailId getId() {
+		return id;
+	}
+
+	public void setId(CartDetailId id) {
+		this.id = id;
+	}
+
 }

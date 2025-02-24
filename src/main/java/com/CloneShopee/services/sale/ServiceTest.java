@@ -9,25 +9,26 @@ import java.util.stream.Collectors;
 
 public class ServiceTest {
     public static void main(String[] args) {
-        Country c1 = new Country(1, "Thanh Hóa");
-        Country c2 = new Country(1, "Thanh Hóa");
-        List<Person> people = Arrays.asList(
-                new Person("Alice", 25, 1),
-                new Person("Bob", 30, 2),
-                new Person("Charlie", 25, 2),
-                new Person("David", 30, 2),
-                new Person("Eve", 35, 1),
-                new Person("Alice", 25, 1));
-        List<Country> countries = people.stream()
-                .collect(Collectors.groupingBy(
-                        Person::getCountryId,
-                        Collectors.toList()))
-                .entrySet().stream()
-                .map(entry -> new Country(entry.getKey(), "Country " + entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
-        countries.forEach(v -> {
-            System.out.println(v);
-        });
+        // Country c1 = new Country(1, "Thanh Hóa");
+        // Country c2 = new Country(1, "Thanh Hóa");
+        // List<Person> people = Arrays.asList(
+        // new Person("Alice", 25, 1),
+        // new Person("Bob", 30, 2),
+        // new Person("Charlie", 25, 2),
+        // new Person("David", 30, 2),
+        // new Person("Eve", 35, 1),
+        // new Person("Alice", 25, 1));
+        // List<Country> countries = people.stream()
+        // .collect(Collectors.groupingBy(
+        // Person::getCountryId,
+        // Collectors.toList()))
+        // .entrySet().stream()
+        // .map(entry -> new Country(entry.getKey(), "Country " + entry.getKey(),
+        // entry.getValue()))
+        // .collect(Collectors.toList());
+        // countries.forEach(v -> {
+        // System.out.println(v);
+        // });
 
     }
 }

@@ -34,7 +34,7 @@ public class Product {
 	@NotBlank(message = "Hình ảnh sản phẩm ko được trống")
 	@NotNull(message = "Ko được bỏ trống ảnh sản phẩm")
 	private String productImage;
-	private String status;
+	private Integer status;
 	private String video;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "brandId")
@@ -164,11 +164,11 @@ public class Product {
 		this.productImage = productImage;
 	}
 
-	public String getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 
