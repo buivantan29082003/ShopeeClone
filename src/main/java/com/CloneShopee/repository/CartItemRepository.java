@@ -26,4 +26,8 @@ public interface CartItemRepository extends JpaRepository<CartItem, CartDetailId
     void updateChangeVariantCart(@Param("productId") Integer productId, @Param("accountId") Integer accountId,
             @Param("idChange") Integer idChange);
 
+    @Modifying
+    @Query("DELETE CartItem p where p.product.id=:productId and p.account.id=:accountId ")
+    public Integer deleteCart(@Param("productId") Integer productId, @Param("accountId") Integer accountId);
+
 }

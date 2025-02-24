@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -48,15 +49,22 @@ public class CartItemController {
     }
 
     @Transactional
+    @DeleteMapping("user/cart/delete")
+    public ResponseEntity<Object> deleteCart(@RequestParam(name = "productId", defaultValue = "-1") Integer productId) {
+        if (cartItemService.deleteCart(productId, shopBean.getAccountId())) {
+            return new ResponseEntity<>(new BaseRespone(null, "success"), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new BaseRespone(null, "Cart item is not valid"), HttpStatus.BAD_REQUEST);
+    }
+
+    @Transactional
     @PutMapping("user/cart/changevariant")
     public ResponseEntity<Object> changeVariantInCartItem(
             @RequestParam(name = "productId", defaultValue = "-1") Integer productId,
             @RequestParam(name = "idChange", defaultValue = "-1") Integer idChange,
             @RequestParam(name = "idProduct", defaultValue = "-1") Integer idProduct) {
         if (cartItemService.checkCartItemOfAccountId(productId, shopBean.getAccountId())) {
-
             if (productService.isSameProduct(productId, idChange, idProduct)) {
-
                 cartItemService.updateVariantCart(productId, shopBean.getAccountId(), idChange);
                 return new ResponseEntity<>(new BaseRespone(null, "Success"), HttpStatus.OK);
             }
@@ -70,7 +78,6 @@ public class CartItemController {
 
     @GetMapping("user/cart/findall")
     public ResponseEntity<Object> getAll() {
-        System.out.println(shopBean.getAccountId());
         List<CartInfoDTO> cartInfoDTOs = cartItemService.getAllCart(shopBean.getAccountId());
         Map<Integer, List<CartInfoDTO>> groupedByShop = cartInfoDTOs.stream()
                 .collect(Collectors.groupingBy(CartInfoDTO::getShopId));

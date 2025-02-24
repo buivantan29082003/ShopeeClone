@@ -36,10 +36,10 @@ public class CartItemService {
 
     public Boolean checkProductIsActiveAndQuantityIsOrder(Integer productId, Integer quantity) {
         Integer quantityProduct = productRepository.getQuantityProductVariantIfActive(productId).orElse(-1);
-        if (quantity <= quantityProduct && quantity != -1) {
-            return true;
-        }
+        return quantity <= quantityProduct && quantity != -1;
+    }
 
-        return false;
+    public Boolean deleteCart(Integer productId, Integer accountId) {
+        return cartItemRepo.deleteCart(productId, accountId) == 1;
     }
 }
