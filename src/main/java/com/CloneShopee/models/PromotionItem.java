@@ -18,7 +18,6 @@ public class PromotionItem {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	@ManyToOne()
-	// @JsonIgnore
 	@JoinColumn(name = "promotionId")
 	private Promotion promotion;
 	@ManyToOne(fetch = FetchType.LAZY)

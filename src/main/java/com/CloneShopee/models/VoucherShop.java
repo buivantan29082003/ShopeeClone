@@ -3,6 +3,9 @@ package com.CloneShopee.models;
 import java.util.Date;
 import java.util.List;
 
+import javax.management.RuntimeErrorException;
+
+import org.hibernate.boot.beanvalidation.IntegrationException;
 import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -12,6 +15,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -24,6 +29,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "VoucherShop")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class VoucherShop {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,20 +52,41 @@ public class VoucherShop {
 	private Integer limitUsage;
 	private Double limitValue;
 	private Integer isActive;
-	private Integer quantityUsed;
+	// private Integer quantityUsed;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonIgnore
 	@JoinColumn(name = "shopId")
 	private Shop shop;
+	@JsonIgnore
 	@OneToMany(mappedBy = "voucherShop", fetch = FetchType.LAZY)
 	private List<VoucherShopItem> voucherItems;
+	private Double minimumPurchase;
 
 	public VoucherShop() {
 
 	}
 
-	public VoucherShop(Integer id) {
+	public void canculateOrder(Order order, Double ammountNotDiscount) {
+		if (ammountNotDiscount >= minimumPurchase) {
+			switch (this.voucherType) {
+				case "PERSENT":
+					order.setTotalAmount(order.getTotalAmount() * (1 - this.discountValue));
+					break;
+				default:
+					Double ammount = order.getTotalAmount() - this.discountValue;
+					order.setTotalAmount(ammount < 0 ? 0 : ammount);
+					break;
+			}
+		} else {
+			throw new IntegrationException("Số tiền hiện tại không thể áp dụng voucher bnayf");
+		}
+	}
 
+	public VoucherShop(Integer id, Double discountValue, String voucherType, Double minimumPurchase) {
+		this.id = id;
+		this.discountValue = discountValue;
+		this.voucherType = voucherType;
+		this.minimumPurchase = minimumPurchase;
 	}
 
 	public String getVoucherName() {
@@ -82,13 +109,13 @@ public class VoucherShop {
 		return id;
 	}
 
-	public Integer getQuantityUsed() {
-		return quantityUsed;
-	}
+	// public Integer getQuantityUsed() {
+	// return quantityUsed;
+	// }
 
-	public void setQuantityUsed(Integer quantityUsed) {
-		this.quantityUsed = quantityUsed;
-	}
+	// public void setQuantityUsed(Integer quantityUsed) {
+	// this.quantityUsed = quantityUsed;
+	// }
 
 	public Shop getShop() {
 		return shop;
@@ -172,6 +199,14 @@ public class VoucherShop {
 
 	public void setVoucherType(String voucherType) {
 		this.voucherType = voucherType;
+	}
+
+	public Double getMinimumPurchase() {
+		return minimumPurchase;
+	}
+
+	public void setMinimumPurchase(Double minimumPurchase) {
+		this.minimumPurchase = minimumPurchase;
 	}
 
 }

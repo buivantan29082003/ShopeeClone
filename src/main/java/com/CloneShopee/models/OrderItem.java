@@ -25,6 +25,21 @@ public class OrderItem {
 	private Integer quantity;
 	private Double price;
 
+	public OrderItem() {
+
+	}
+
+	public OrderItem(ProductVariant product, Order order, Integer quantity, Double price) {
+		this.product = product;
+		this.order = order;
+		this.quantity = quantity;
+		this.price = price;
+	}
+
+	public Double caculatePrice() {
+		return this.quantity * this.price;
+	}
+
 	public Integer getId() {
 		return id;
 	}

@@ -1,5 +1,6 @@
 package com.CloneShopee.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.CloneShopee.services.sale.PromotionService;
@@ -33,6 +34,25 @@ public class PromotionCombo extends Promotion {
 
     public PromotionCombo() {
 
+    }
+
+    @Override
+    public Double caculatePrice(Integer quantity, Double price) {
+        Integer index = -1;
+        if (this.limitOrder < quantity + 1) {
+            for (int i = 0; i < promitionComboOptions.size(); i++) {
+                PromotionComboOption v = promitionComboOptions.get(i);
+                if (quantity >= v.getQuantityRequire()) {
+                    index = i;
+                } else {
+                    break;
+                }
+            }
+            if (index != -1) {
+                return this.promitionComboOptions.get(index).handlePrice(quantity, price, this.typeCombo);
+            }
+        }
+        return price;
     }
 
     public Integer getLimit() {

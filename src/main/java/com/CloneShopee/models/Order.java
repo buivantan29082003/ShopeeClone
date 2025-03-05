@@ -1,6 +1,7 @@
 package com.CloneShopee.models;
 
 import java.util.Date;
+import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -26,7 +28,7 @@ public class Order {
 	@ManyToOne
 	@JoinColumn(name = "voucherShopId")
 	private VoucherShop voucherShop;
-	private Double totalAmount;
+	private Double totalAmount = 0.0;
 	private String note;
 	private Double shipFee;
 	private String fullAddress;
@@ -41,6 +43,13 @@ public class Order {
 	@JoinColumn(name = "statusId")
 	private Status status;
 	private String tag;
+
+	@OneToMany(mappedBy = "order")
+	private List<OrderItem> orderItems;
+
+	public void plusTotal(Double ammount) {
+		this.totalAmount += ammount;
+	}
 
 	public Integer getId() {
 		return id;
@@ -144,6 +153,14 @@ public class Order {
 
 	public void setTag(String tag) {
 		this.tag = tag;
+	}
+
+	public List<OrderItem> getOrderItems() {
+		return orderItems;
+	}
+
+	public void setOrderItems(List<OrderItem> orderItems) {
+		this.orderItems = orderItems;
 	}
 
 }

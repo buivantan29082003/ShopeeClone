@@ -13,17 +13,29 @@ public class Status {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private String statusName;
+
+	public Status(Integer id) {
+		this.id = id;
+	}
+
+	public Status() {
+
+	}
+
 	public Integer getId() {
 		return id;
 	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
 	public String getStatusName() {
 		return statusName;
 	}
+
 	public void setStatusName(String statusName) {
 		this.statusName = statusName;
 	}
-	
+
 }

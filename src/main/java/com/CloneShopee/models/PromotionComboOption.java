@@ -18,7 +18,7 @@ public class PromotionComboOption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Integer quantityRequire;
-    private Integer valueDiscountCustome;
+    private Double valueDiscountCustome;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "promotionId")
@@ -36,15 +36,26 @@ public class PromotionComboOption {
         return quantityRequire;
     }
 
+    public Double handlePrice(Integer quantity, Double price, String type) {
+        switch (type) {
+            case "PERSENT":
+                return price * (valueDiscountCustome / 100);
+            case "PRICE":
+                return price = price - valueDiscountCustome < 0 ? 0 : price - valueDiscountCustome;
+            default:
+                return price = valueDiscountCustome / quantity;
+        }
+    }
+
     public void setQuantityRequire(Integer quantityRequire) {
         this.quantityRequire = quantityRequire;
     }
 
-    public Integer getValueDiscountCustome() {
+    public Double getValueDiscountCustome() {
         return valueDiscountCustome;
     }
 
-    public void setValueDiscountCustome(Integer valueDiscountCustome) {
+    public void setValueDiscountCustome(Double valueDiscountCustome) {
         this.valueDiscountCustome = valueDiscountCustome;
     }
 

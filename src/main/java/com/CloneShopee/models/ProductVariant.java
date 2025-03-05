@@ -29,6 +29,14 @@ public class ProductVariant {
 	private Integer isDefault;
 	private String indexVariant;
 
+	public ProductVariant() {
+
+	}
+
+	public ProductVariant(Integer id) {
+		this.id = id;
+	}
+
 	public String getIndex() {
 		return indexVariant;
 	}
