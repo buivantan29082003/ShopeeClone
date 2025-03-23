@@ -3,6 +3,8 @@ package com.CloneShopee.Bean;
 import com.CloneShopee.models.Account;
 import com.CloneShopee.models.Shop;
 
+
+
 public class ShopBean {
     private Shop shop = new Shop(1);
     private Integer accountId = 1;
