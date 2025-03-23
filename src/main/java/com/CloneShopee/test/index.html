@@ -6,19 +6,17 @@
     <title>Gọi API Đặt Hàng</title>
     <script>
         async function placeOrder() {
-           for(let i=0;i<100;i++){
+           for(let i=0;i<1;i++){
             const button = document.getElementById("orderButton");
             const statusText = document.getElementById("status");
             
             // Bật trạng thái loading
             button.disabled = true;
             button.innerText = "Đang xử lý...";
-            statusText.innerText = "";
-
-            // Dữ liệu gửi đi
+            statusText.innerText = ""; 
             const requestData = {
                 cartItems: [580, 582, 581, 583],
-                shops: [{ shopId: 1}]
+                shops: [{ shopId: 1,voucherId:29,voucherStyle:"BUYBACK"}]
             };
 
             try {

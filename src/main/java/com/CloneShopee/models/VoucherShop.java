@@ -62,19 +62,22 @@ public class VoucherShop {
 	private List<VoucherShopItem> voucherItems;
 	private Double minimumPurchase;
 
+	private String voucherStyle;
+
 	public VoucherShop() {
 
 	}
 
-	public void canculateOrder(Order order, Double ammountNotDiscount) {
+	public void canculateOrder(Order order, Double ammountNotDiscount, Double totalAmmountInVoucher) {
 		if (ammountNotDiscount >= minimumPurchase) {
 			switch (this.voucherType) {
 				case "PERSENT":
-					order.setTotalAmount(order.getTotalAmount() * (1 - this.discountValue));
+					order.setTotalAmount(order.getTotalAmount() - (totalAmmountInVoucher * (1 - this.discountValue)));
 					break;
 				default:
-					Double ammount = order.getTotalAmount() - this.discountValue;
-					order.setTotalAmount(ammount < 0 ? 0 : ammount);
+					Double ammount = totalAmmountInVoucher - this.discountValue;
+					order.setTotalAmount(ammount < 0 ? order.getTotalAmount() - totalAmmountInVoucher
+							: order.getTotalAmount() - ammount);
 					break;
 			}
 		} else {
@@ -207,6 +210,14 @@ public class VoucherShop {
 
 	public void setMinimumPurchase(Double minimumPurchase) {
 		this.minimumPurchase = minimumPurchase;
+	}
+
+	public String getVoucherStyle() {
+		return voucherStyle;
+	}
+
+	public void setVoucherStyle(String voucherStyle) {
+		this.voucherStyle = voucherStyle;
 	}
 
 }

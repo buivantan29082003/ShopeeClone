@@ -38,6 +38,8 @@ public class Promotion {
 	private Integer isActive;
 	private Date createdDate;
 	private String promotionType;
+	private String signature;
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "promotion", cascade = CascadeType.REMOVE)
 	private List<PromotionItem> promotionItems;
@@ -116,5 +118,13 @@ public class Promotion {
 
 	public void setPromotionItems(List<PromotionItem> promotionItems) {
 		this.promotionItems = promotionItems;
+	}
+
+	public String getSignature() {
+		return signature;
+	}
+
+	public void setSignature(String signature) {
+		this.signature = signature;
 	}
 }

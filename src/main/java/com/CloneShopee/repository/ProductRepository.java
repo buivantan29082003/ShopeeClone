@@ -14,6 +14,9 @@ import com.CloneShopee.models.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Integer>, JpaSpecificationExecutor<Product> {
 
+    @Query(" SELECT p FROM Product p JOIN FETCH p.shop JOIN FETCH p.brand JOIN FETCH p.category  WHERE p.id = :productId")
+    Optional<Product> findByIdFullProperties(@Param("productId") Integer id);
+
     @Query("SELECT count(p.product.id) FROM ProductVariant p where (p.id=:productId1 or p.id=:productId2) and p.product.id=:productId and p.isActive=1")
     Integer checkVariantSameProduct(@Param("productId1") Integer productId1,
             @Param("productId2") Integer productId2, @Param("productId") Integer productid);

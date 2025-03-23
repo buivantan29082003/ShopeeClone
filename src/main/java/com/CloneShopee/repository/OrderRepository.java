@@ -1,5 +1,6 @@
 package com.CloneShopee.repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -61,4 +62,13 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
        void updateStatusAndTagOrders(@Param("orderId") Integer orderIds, @Param("tag") String tag,
                      @Param("statusId") Integer statusId);
 
+       @Query("select count(p.id) from Order p where p.shop.id=:shopId and p.account.id=:accountId")
+       public Optional<Integer> checkNewCustomer(@Param("shopId") Integer shopId,
+                     @Param("accountId") Integer accountId);
+
+       @Query("SELECT COUNT(p.id) FROM Order p WHERE p.account.id = :accountId AND p.createdDate >=:dateNear")
+       public Integer checkBuyBack(@Param("dateNear") Date dateNear,
+                     @Param("accountId") Integer accountId);
+
 }
+

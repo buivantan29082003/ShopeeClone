@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.CloneShopee.DTO.Sale.Voucher.VoucherInsert;
 import com.CloneShopee.DTO.Sale.Voucher.VoucherUpdate;
 import com.CloneShopee.ExceptionGlobal.ConstraintException;
+import com.CloneShopee.models.Order;
 import com.CloneShopee.models.Product;
 import com.CloneShopee.models.Shop;
 import com.CloneShopee.models.VoucherShop;
@@ -32,8 +33,16 @@ public class VoucherService {
     @Autowired
     VoucherShopItemRepository voucherShopItemRepo;
 
+    public VoucherShop getVoucherByIdAndStarting(Integer voucherId) {
+        return voucherRepo.getVoucherByIdAndStarting(voucherId);
+    }
+
     public Object getAllVoucher() {
         return voucherRepo.findAll();
+    }
+
+    public List<VoucherShop> getVoucherOfShopAndAccountReciveAndStarting(Integer accountId, Integer shopId) {
+        return voucherRepo.getVoucherOfShopAndAccountReciveAndStarting(shopId, accountId);
     }
 
     public void checkVoucherOfShop(Integer id, Integer shop) {
@@ -42,13 +51,13 @@ public class VoucherService {
         }
     }
 
-    public void saveVoucher(VoucherInsert voucher, Shop shop) {
-        voucher.getVoucher().setShop(shop);
-        voucher.getVoucher().setId(null);
-        voucherRepo.save(voucher.getVoucher());
+    public void saveVoucher(VoucherShop voucher, Shop shop, Set<Integer> productIds) {
+        voucher.setShop(shop);
+        voucher.setId(null);
+        voucherRepo.save(voucher);
         List<VoucherShopItem> voucherItems = new ArrayList<>();
-        for (Integer productId : voucher.getProductIds()) {
-            voucherItems.add(new VoucherShopItem(voucher.getVoucher(), new Product(productId)));
+        for (Integer productId : productIds) {
+            voucherItems.add(new VoucherShopItem(voucher, new Product(productId)));
         }
         voucherShopItemRepo.saveAll(voucherItems);
     }
@@ -86,24 +95,29 @@ public class VoucherService {
         }
     }
 
-    public void handleItemVoucher(Integer voucherId, Set<Integer> productIds, Boolean isChange) {
-        if (isChange) {
-            voucherRepo.deleteVoucherItemInProductIds(productIds);
-            Set<Integer> productIdsOld = voucherRepo.getProductIdsOfVoucher(productIds, voucherId);
-            productIds.removeAll(productIdsOld);
-            List<VoucherShopItem> voucherShopItems = new ArrayList<>();
-            VoucherShop voucher = new VoucherShop(voucherId);
-            for (Integer productId : productIds) {
-                voucherShopItems.add(new VoucherShopItem(voucher, new Product(productId)));
-            }
-            voucherShopItemRepo.saveAll(voucherShopItems);
-        }
-    }
+    //
+    // public void handleItemVoucher(Integer voucherId, Set<Integer> productIds,
+    // Boolean isChange) {
+    // if (isChange) {
+    // voucherRepo.deleteVoucherItemInProductIds(productIds);
+    // Set<Integer> productIdsOld = voucherRepo.getProductIdsOfVoucher(productIds,
+    // voucherId);
+    // productIds.removeAll(productIdsOld);
+    // List<VoucherShopItem> voucherShopItems = new ArrayList<>();
+    // VoucherShop voucher = new VoucherShop(voucherId);
+    // for (Integer productId : productIds) {
+    // voucherShopItems.add(new VoucherShopItem(voucher, new Product(productId)));
+    // }
+    // voucherShopItemRepo.saveAll(voucherShopItems);
+    // }
+    // }
 
-    public void updateInforVoucher(VoucherUpdate voucher) {
-        voucherRepo.updateVoucherShop(voucher.getId(), voucher.getVoucherName(), voucher.getStartDate(),
-                voucher.getEndDate(), voucher.getVoucherType(), voucher.getDiscountValue(), voucher.getLimitUsage(),
-                voucher.getLimitValue(), voucher.getIsActive());
-    }
+    // public void updateInforVoucher(VoucherUpdate voucher) {
+    // voucherRepo.updateVoucherShop(voucher.getId(), voucher.getVoucherName(),
+    // voucher.getStartDate(),
+    // voucher.getEndDate(), voucher.getVoucherType(), voucher.getDiscountValue(),
+    // voucher.getLimitUsage(),
+    // voucher.getLimitValue(), voucher.getIsActive());
+    // }
 
 }

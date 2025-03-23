@@ -22,12 +22,12 @@ public class VoucherShopAccount {
 		this.id = id;
 	}
 
-	public Integer getCountUsed() {
+	public Integer getQuantityUsed() {
 		return quantityUsed;
 	}
 
-	public void setCountUsed(Integer countUsed) {
-		this.quantityUsed = countUsed;
+	public void setQuantityUsed(Integer quantityUsed) {
+		this.quantityUsed = quantityUsed;
 	}
 
 }

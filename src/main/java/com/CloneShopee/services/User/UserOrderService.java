@@ -1,9 +1,13 @@
 package com.CloneShopee.services.User;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.hibernate.boot.beanvalidation.IntegrationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +21,7 @@ import com.CloneShopee.models.ProductVariant;
 import com.CloneShopee.models.Promotion;
 import com.CloneShopee.models.Shop;
 import com.CloneShopee.models.Status;
+import com.CloneShopee.models.VoucherBuyBack;
 import com.CloneShopee.models.VoucherShop;
 import com.CloneShopee.repository.CartItemRepository;
 import com.CloneShopee.repository.OrderItemRepository;
@@ -62,7 +67,8 @@ public class UserOrderService {
         Double ammountNotDiscount = 0.0;
         if (shopItem.getVoucherId() != null) {
             for (OrderItemDTO v : items) {
-                orderItem = new OrderItem(new ProductVariant(v.getProductVariantId()), order, 1, v.getPrice());
+                orderItem = new OrderItem(new ProductVariant(v.getProductVariantId()), order, 1, v.getPrice(),
+                        v.getProductId());
                 l = promotions.get(v.getProductId());
                 if (l != null) {
                     for (Promotion vv : l) {
@@ -86,27 +92,75 @@ public class UserOrderService {
                 orderItems.add(orderItem);
             }
         }
-
         order.setShop(new Shop(shopItem.getShopId()));
         order.setAccount(shopBean.getAccount());
         orders.add(order);
-        checkVoucher(order, shopItem.getVoucherId(), shopItem.getShopId(), shopBean.getAccount().getId(),
-                ammountNotDiscount);
+        checkVoucher(order, shopItem.getVoucherId(), shopItem.getVoucherStyle(), shopItem.getShopId(),
+                shopBean.getAccount().getId(),
+                ammountNotDiscount, orderItems);
     }
 
-    public void checkVoucher(Order order, Integer voucherId, Integer shopId, Integer accountId,
-            Double ammountNotDiscount) {
+    public void checkVoucher(Order order, Integer voucherId, String voucherStyle, Integer shopId, Integer accountId,
+            Double ammountNotDiscount, List<OrderItem> orderItems) {
         if (voucherId != null) {
-            VoucherShop voucherShop = voucherRepository.getVoucherShopIsApply(voucherId, shopId, accountId)
-                    .orElse(null);
+            VoucherShop voucherShop = getVoucherBuyType(voucherStyle, voucherId, shopId);
             if (voucherShop != null) {
-                voucherShop.canculateOrder(order, ammountNotDiscount);
-                updateOrderQuantityUsed(voucherId, accountId);
-                order.setVoucherShop(voucherShop);
+                Set<Integer> productIds = voucherRepository.getVoucherIdIdProduct(voucherId);
+                Double total = -1.0;
+                for (OrderItem v : orderItems) {
+                    if (productIds.contains(v.getProductId())) {
+                        total += v.getPrice() * v.getQuantity();
+                    }
+                }
+                if (total > 0) {
+                    voucherShop.canculateOrder(order, ammountNotDiscount, total);
+                    updateOrderQuantityUsed(voucherId, accountId);
+                    order.setVoucherShop(voucherShop);
+                } else {
+                    throw new RuntimeException(" voucher shop này ko áp dụng được nha ");
+                }
             } else {
-                throw new RuntimeException(" voucher shop này ko áp dụng được ");
+                throw new RuntimeException(" voucher shop này ko áp dụng được nha ");
             }
         }
+    }
+
+    public VoucherShop getVoucherBuyType(String style, Integer voucherId, Integer shopId) {
+        VoucherShop voucher = null;
+        switch (style) {
+            case "BUYBACK":
+                VoucherBuyBack voucherBuyBack = voucherRepository
+                        .getVoucherShopBuyBackIsApply(voucherId, shopId, shopBean.getAccount().getId(), style)
+                        .orElse(null);
+                if (voucherBuyBack != null) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(new Date());
+                    calendar.add(Calendar.DAY_OF_MONTH, -voucherBuyBack.getCountDayOrder());
+                    Date dateBefore30Days = calendar.getTime();
+                    if (orderRepo.checkBuyBack(dateBefore30Days, shopBean.getAccount().getId()) >= voucherBuyBack
+                            .getCountDayAVG()) {
+                        voucher = voucherBuyBack;
+                    }
+                }
+                break;
+            case "NEWCUSTOMER":
+                VoucherShop voucherShops = voucherRepository
+                        .getVoucherShopIsApply(voucherId, shopId, shopBean.getAccount().getId(), style).orElse(null);
+
+                if (voucherShops != null
+                        || orderRepo.checkNewCustomer(shopId, shopBean.getAccount().getId()).orElse(null) == null) {
+                    voucher = voucherShops;
+                }
+                break;
+            default:
+                VoucherShop voucherShop = voucherRepository
+                        .getVoucherShopIsApply(voucherId, shopId, shopBean.getAccount().getId(), style).orElse(null);
+                if (voucherShop != null) {
+                    voucher = voucherShop;
+                }
+                break;
+        }
+        return voucher;
     }
 
     public void saveOrder(List<Order> orders, List<OrderItem> orderItems) {

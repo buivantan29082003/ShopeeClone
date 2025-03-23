@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Min;
 
 @Entity
@@ -25,6 +26,9 @@ public class OrderItem {
 	private Integer quantity;
 	private Double price;
 
+	@Transient
+	private Integer productId;
+
 	public OrderItem() {
 
 	}
@@ -34,6 +38,14 @@ public class OrderItem {
 		this.order = order;
 		this.quantity = quantity;
 		this.price = price;
+	}
+
+	public OrderItem(ProductVariant product, Order order, Integer quantity, Double price, Integer productId) {
+		this.product = product;
+		this.order = order;
+		this.quantity = quantity;
+		this.price = price;
+		this.productId = productId;
 	}
 
 	public Double caculatePrice() {
@@ -78,6 +90,14 @@ public class OrderItem {
 
 	public void setPrice(Double price) {
 		this.price = price;
+	}
+
+	public Integer getProductId() {
+		return productId;
+	}
+
+	public void setProductId(Integer productId) {
+		this.productId = productId;
 	}
 
 }

@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.CloneShopee.Bean.ShopBean;
 import com.CloneShopee.DTO.Sale.Voucher.VoucherInsert;
 import com.CloneShopee.DTO.Sale.Voucher.VoucherUpdate;
+import com.CloneShopee.models.VoucherBuyBack;
+import com.CloneShopee.models.VoucherFolower;
+import com.CloneShopee.models.VoucherShop;
 import com.CloneShopee.services.sale.VoucherService;
 
 import jakarta.transaction.Transactional;
@@ -30,12 +33,34 @@ public class VoucherController {
 
     @Transactional
     @PostMapping("sale/voucher/add")
-    public ResponseEntity<Object> addVoucher(@RequestBody @Valid VoucherInsert voucher) {
+    public ResponseEntity<Object> addVoucher(@RequestBody @Valid VoucherInsert<VoucherShop> voucher) {
         voucherService.checkProductOfShop(voucher.getProductIds(), shopbean.getShop().getId());
         voucherService.checkTimeVoucher(voucher.getVoucher().getStartDate(), voucher.getVoucher().getEndDate());
         voucherService.checkvalueDisCount(voucher.getVoucher().getVoucherType(),
                 voucher.getVoucher().getDiscountValue());
-        voucherService.saveVoucher(voucher, shopbean.getShop());
+        voucherService.saveVoucher(voucher.getVoucher(), shopbean.getShop(), voucher.getProductIds());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Transactional
+    @PostMapping("sale/voucher/add/folower")
+    public ResponseEntity<Object> addVoucherFolower(@RequestBody @Valid VoucherInsert<VoucherFolower> voucher) {
+        voucherService.checkProductOfShop(voucher.getProductIds(), shopbean.getShop().getId());
+        voucherService.checkTimeVoucher(voucher.getVoucher().getStartDate(), voucher.getVoucher().getEndDate());
+        voucherService.checkvalueDisCount(voucher.getVoucher().getVoucherType(),
+                voucher.getVoucher().getDiscountValue());
+        voucherService.saveVoucher(voucher.getVoucher(), shopbean.getShop(), voucher.getProductIds());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Transactional
+    @PostMapping("sale/voucher/add/buyback")
+    public ResponseEntity<Object> addVoucherBuyBack(@RequestBody @Valid VoucherInsert<VoucherBuyBack> voucher) {
+        voucherService.checkProductOfShop(voucher.getProductIds(), shopbean.getShop().getId());
+        voucherService.checkTimeVoucher(voucher.getVoucher().getStartDate(), voucher.getVoucher().getEndDate());
+        voucherService.checkvalueDisCount(voucher.getVoucher().getVoucherType(),
+                voucher.getVoucher().getDiscountValue());
+        voucherService.saveVoucher(voucher.getVoucher(), shopbean.getShop(), voucher.getProductIds());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

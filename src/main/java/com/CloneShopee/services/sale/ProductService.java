@@ -1,7 +1,5 @@
 package com.CloneShopee.services.sale;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,12 +8,11 @@ import org.hibernate.boot.beanvalidation.IntegrationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PutMapping;
-import com.CloneShopee.DTO.Sale.product.ProductInfo;
+
+import com.CloneShopee.DTO.User.PromotionInProductSearch;
 import com.CloneShopee.ExceptionGlobal.ConstraintException;
 import com.CloneShopee.models.Product;
 import com.CloneShopee.models.ProductVariant;
-import com.CloneShopee.models.PromotionItem;
 import com.CloneShopee.models.Property;
 import com.CloneShopee.models.PropertyItem;
 import com.CloneShopee.models.VariantTier;
@@ -60,12 +57,34 @@ public class ProductService {
 		return productRepo.findById(id).orElse(null);
 	}
 
-	public List<ProductInfo> findProducts(String name, List<Integer> categoryIds, String status) {
-		Specification<Product> spec = ProductSpecification.filterProductsWithJoinfetch(name, categoryIds,
-				statusProduct.get(status));
-		List<Product> products = productRepo.findAll(spec);
-		List<ProductInfo> productInfoList = products.stream().map(ProductInfo::new).toList();
-		return productInfoList;
+	public List<PromotionInProductSearch> getPromotionInfoOfProduct(List<Product> products) {
+		return promotionRepo.getPromotionInfoInListProduct(products);
+	}
+
+	public List<Product> filterProducts(String name, List<Integer> categoryIds, Integer status,
+			List<Integer> brandIds, Double minPrice, Double maxPrice) {
+		Specification<Product> spec = ProductSpecification.filterProductsWithJoinfetch(name, categoryIds, status,
+				brandIds, minPrice, maxPrice);
+		return productRepo.findAll(spec);
+	}
+
+	public List<Product> findAllProducts() {
+		return productRepo.findAll();
+	}
+
+	public Product findByIdFullProperties(Integer productId) {
+		Product product = productRepo.findByIdFullProperties(productId).orElse(null);
+		if (product != null) {
+			product.setVariantTiers(null);
+			product.getProductImage();
+			product.getProductVariants();
+			product.setPromotionItems(null);
+		}
+		return product;
+	}
+
+	public List<PromotionInProductSearch> getPromotionOfProductId(Integer productId) {
+		return promotionRepo.getPromotionInfoByProductid(productId);
 	}
 
 	public void updateStatusProduct(String status, Integer productId, Integer shopId) {
