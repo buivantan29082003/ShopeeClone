@@ -18,27 +18,18 @@ public class OrderSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // JOIN status, payment và account
-            Join<Order, Status> statusJoin = root.join("status", JoinType.INNER);
-            Join<Order, Payment> paymentJoin = root.join("payment", JoinType.INNER);
-            Join<Order, Account> accountJoin = root.join("account", JoinType.INNER); // ⚠ THÊM JOIN ACCOUNT
-
-            // Điều kiện bắt buộc: shopId
+            if (statusId != -1) {
+                predicates.add(criteriaBuilder.equal(root.get("status").get("id"), statusId));
+            }
+            if (paymentId != -1) {
+                predicates.add(criteriaBuilder.equal(root.get("payment").get("id"), paymentId));
+            }
             if (shopId != null) {
                 predicates.add(criteriaBuilder.equal(root.get("shop").get("id"), shopId));
-            }
-
-            // Điều kiện tùy chọn: statusId (nếu khác -1)
-            if (statusId != -1) {
-                predicates.add(criteriaBuilder.equal(statusJoin.get("id"), statusId));
-            }
-
-            // Điều kiện tùy chọn: paymentId (nếu khác -1)
-            if (paymentId != -1) {
-                predicates.add(criteriaBuilder.equal(paymentJoin.get("id"), paymentId));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
+
 }

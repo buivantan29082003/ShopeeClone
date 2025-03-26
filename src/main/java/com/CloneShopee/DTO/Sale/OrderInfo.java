@@ -5,6 +5,7 @@ import java.util.Date;
 import com.CloneShopee.models.Account;
 import com.CloneShopee.models.Payment;
 import com.CloneShopee.models.Status;
+import com.CloneShopee.models.VoucherShop;
 
 public class OrderInfo {
     private Integer id;
@@ -12,9 +13,9 @@ public class OrderInfo {
     private Status status;
     private Double totalAmount;
     private String fullAddress;
-    private Integer accountId;
-    private String accountFullName;
+    private Account account;
     private Payment payment;
+    private VoucherShop voucher;
 
     // Constructor đầy đủ
     public OrderInfo(Integer id, Date createdDate, Status status, Double totalAmount, String fullAddress,
@@ -24,8 +25,6 @@ public class OrderInfo {
         this.status = status;
         this.totalAmount = totalAmount;
         this.fullAddress = fullAddress;
-        this.accountId = accountId;
-        this.accountFullName = accountFullName;
         this.payment = payment;
     }
 
@@ -36,9 +35,10 @@ public class OrderInfo {
         this.status = order.getStatus();
         this.totalAmount = order.getTotalAmount();
         this.fullAddress = order.getFullAddress();
-        this.accountId = order.getAccount().getId();
-        this.accountFullName = order.getAccount().getFullName();
+        this.account = order.getAccount();
         this.payment = order.getPayment();
+        this.voucher = order.getVoucherShop();
+
     }
 
     // Getters và Setters
@@ -82,27 +82,27 @@ public class OrderInfo {
         this.fullAddress = fullAddress;
     }
 
-    public Integer getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(Integer accountId) {
-        this.accountId = accountId;
-    }
-
-    public String getAccountFullName() {
-        return accountFullName;
-    }
-
-    public void setAccountFullName(String accountFullName) {
-        this.accountFullName = accountFullName;
-    }
-
     public Payment getPayment() {
         return payment;
     }
 
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
     public void setPayment(Payment payment) {
         this.payment = payment;
+    }
+
+    public VoucherShop getVoucher() {
+        return voucher;
+    }
+
+    public void setVoucher(VoucherShop voucher) {
+        this.voucher = voucher;
     }
 }

@@ -19,15 +19,23 @@ import com.CloneShopee.models.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Integer>, JpaSpecificationExecutor<Order> {
 
-       // @Query("SELECT p.id as id,p.status as status, p.payment as
-       // payment,p.createdDate as createdDate,p.totalAmount as
-       // totalAmount,p.fullAddress as fullAddress,p.account.id as
-       // accountId,p.account.fullName as accountFullName FROM Order p where
-       // p.shop.id=:shopId and (:statusId=-1 or :statusId=p.status.id) and
-       // (:paymentId=-1 or :paymentId=p.payment.id)")
-       // Page<OrderInfo> getOrderInfos(@Param("shopId") Integer shopId, Integer
-       // statusId, Integer paymentId,
-       // Pageable page);
+       @Query("""
+                     SELECT p.id AS id,
+                            p.status AS status,
+                            p.payment AS payment,
+                            p.createdDate AS createdDate,
+                            p.totalAmount AS totalAmount,
+                            p.fullAddress AS fullAddress,
+                            p.account.id AS accountId,
+                            p.account.id AS accountFullName
+                     FROM Order p
+                     WHERE p.shop.id = :shopId
+                     """)
+       Page<OrderInfo> getOrderInfos(
+                     @Param("shopId") Integer shopId,
+                     @Param("statusId") Integer statusId,
+                     @Param("paymentId") Integer paymentId,
+                     Pageable page);
 
        @Query("""
                          SELECT p.id as id,

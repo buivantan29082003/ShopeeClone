@@ -15,6 +15,10 @@ public class VoucherBuyBack extends VoucherShop {
     @Max(value = 90, message = "Khoảng thời gian mua từ 30 đến 90 ngày")
     private Integer countDayOrder;
 
+    public VoucherBuyBack() {
+
+    }
+
     public VoucherBuyBack(Integer id, Double discountValue, String voucherType, Double minimumPurchase,
             Integer countOrderAVG, Integer countDayOrder) {
         this.setId(id);

@@ -1,6 +1,7 @@
 package com.CloneShopee.models;
 
 import java.util.Date;
+import java.util.Objects;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,8 +31,25 @@ public class Account {
 
 	}
 
+	public Account(Integer accountId, String fullName, String phoneNumber) {
+		this.id = accountId;
+		this.fullName = fullName;
+		this.phoneNumber = phoneNumber;
+	}
+
 	public Account(Integer accountId) {
 		this.id = accountId;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		Account other = (Account) obj;
+		return Objects.equals(id, other.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
 	}
 
 	public Integer getId() {

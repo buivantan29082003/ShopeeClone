@@ -4,26 +4,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.hibernate.query.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
-import com.CloneShopee.DTO.Sale.OrderInfo;
 import com.CloneShopee.DTO.Sale.OrderItemDTO;
 import com.CloneShopee.ExceptionGlobal.ConstraintException;
+import com.CloneShopee.models.Account;
 import com.CloneShopee.models.Order;
+import com.CloneShopee.repository.AccountRepository;
 import com.CloneShopee.repository.OrderItemRepository;
 import com.CloneShopee.repository.OrderRepository;
-import com.CloneShopee.repository.SpecificationBuilder.OrderIrtemSpecify;
 import com.CloneShopee.repository.SpecificationBuilder.OrderSpecification;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
+import co.elastic.clients.elasticsearch.ml.Page;
 
 @Service
 public class OrderService {
@@ -41,13 +37,22 @@ public class OrderService {
     private OrderRepository orderRepo;
     @Autowired
     OrderItemRepository orderItemRepo;
+    @Autowired
+    AccountRepository accountRepository;
 
-    public org.springframework.data.domain.Page<Order> getAllOrder(Integer shopId, Integer statusId,
-            Integer paymentId,
+    public void fetchAccount(Set<Integer> accountIds, List<Order> orders) {
+        List<Account> accounts = accountRepository.getInfoAccountInIds(accountIds);
+        Map<Integer, Account> accountMap = accounts.stream()
+                .collect(Collectors.toMap(Account::getId, account -> account));
+        orders.forEach(v -> {
+            v.setAccount(accountMap.get(v.getAccount().getId()));
+        });
+    }
+
+    public org.springframework.data.domain.Page<Order> getAllOrder(Integer shopId, Integer statusId, Integer paymentId,
             org.springframework.data.domain.Pageable page) {
-        Specification<Order> spec = OrderSpecification.filterBy(shopId, statusId, paymentId);
-
-        return orderRepo.findAll(spec, page);
+        Specification<Order> specification = OrderSpecification.filterBy(shopId, statusId, paymentId);
+        return orderRepo.findAll(specification, page);
     }
 
     public Boolean checkOrderOfShop(Integer orderId, Integer shopId) {

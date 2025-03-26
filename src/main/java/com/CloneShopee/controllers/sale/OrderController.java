@@ -3,10 +3,12 @@ package com.CloneShopee.controllers.sale;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +47,10 @@ public class OrderController {
         Pageable pageSearch = PageRequest.of(page, pageSize);
         Page<Order> data = orderService.getAllOrder(shopBean.getShop().getId(), statusId, paymentId, pageSearch);
         List<OrderInfo> orders = new ArrayList<OrderInfo>();
-        data.getContent().forEach(v -> {
+        orderService.fetchAccount(
+                data.getContent().stream().map(order -> order.getAccount().getId()).collect(Collectors.toSet()),
+                data.getContent());
+        data.forEach(v -> {
             orders.add(new OrderInfo(v));
         });
         return new ResponseEntity<>(orders, HttpStatus.OK);

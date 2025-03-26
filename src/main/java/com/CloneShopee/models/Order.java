@@ -27,10 +27,10 @@ public class Order {
 	private Integer id;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createdDate;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "accountId")
 	private Account account;
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "voucherShopId")
 	private VoucherShop voucherShop;
 	private Double totalAmount = 0.0;
@@ -41,10 +41,10 @@ public class Order {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "shopId")
 	private Shop shop;
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "paymentId")
 	private Payment payment;
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "statusId")
 	private Status status;
 	private String tag;
