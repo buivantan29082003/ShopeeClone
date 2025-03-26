@@ -13,6 +13,10 @@ public interface OrderItemDTO {
 
     String getProductName();
 
+    Integer getVariantId();
+
+    Integer getProductId();
+
     @JsonIgnore
     Integer getOrderId();
 }

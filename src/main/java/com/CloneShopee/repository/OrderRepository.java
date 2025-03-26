@@ -53,8 +53,16 @@ public interface OrderRepository extends JpaRepository<Order, Integer>, JpaSpeci
        @Query("SELECT p.quantity as quantity, p.price as price, p.product.id as productVariantId,p.product.product.id as productId,p.product.image as productImage,p.order.id as orderId FROM OrderItem p WHERE p.order.id IN :orderIds")
        List<OrderItemDTO> getOrderItemsInOrderList(@Param("orderIds") List<Integer> orderIds);
 
-       @Query("SELECT p.quantity as quantity, p.price as price,p.product.product.productName as productName,p.product.variantName as variantName, p.product.id as productVariantId,p.product.product.id as productId,p.product.image as productImage,p.order.id as orderId FROM OrderItem p")
+       @Query("SELECT p.quantity as quantity, p.price as price,p.product.product.productName as productName,p.product.variantName as variantName,p.product.product.id as productId,p.product.image as productImage,p.order.id as orderId,p.product.id as variantId FROM OrderItem p where p.order.id=:orderId")
        List<OrderItemDTO> getOrderItemsByOrderId(@Param("orderId") Integer orderId);
+
+       // @Query("SELECT p.quantity as quantity, p.price as
+       // price,p.product.product.productName as productName,p.product.variantName as
+       // variantName, p.product.id as productVariantId,p.product.product.id as
+       // productId,p.product.image as productImage,p.order.id as orderId FROM
+       // OrderItem p where p.order.id=:orderId")
+       // List<com.CloneShopee.DTO.User.OrderItemDTO>
+       // getOrderItemsByOrderIdỦe(@Param("orderId") Integer orderId);
 
        @Query("SELECT p.id FROM Order p where p.id=:orderId and p.shop.id=:shopId")
        Optional<Integer> checkOrderOfShop(@Param("orderId") Integer orderId, @Param("shopId") Integer shopId);
@@ -83,8 +91,14 @@ public interface OrderRepository extends JpaRepository<Order, Integer>, JpaSpeci
        public Optional<Integer> checkNewCustomer(@Param("shopId") Integer shopId,
                      @Param("accountId") Integer accountId);
 
+       @Query("select p from OrderItem p where p.order.id=:orderId")
+       public Optional<Integer> getOrderItemByOrderId(@Param("orderId") Integer orderId);
+
        @Query("SELECT COUNT(p.id) FROM Order p WHERE p.account.id = :accountId AND p.createdDate >=:dateNear")
        public Integer checkBuyBack(@Param("dateNear") Date dateNear,
                      @Param("accountId") Integer accountId);
 
+       @Query("select p.status.id from Order p where p.id=:orderId and p.account.id=:accountId")
+       public Optional<Integer> getOrderByAccountIdAndOrderId(@Param("accountId") Integer accountId,
+                     @Param("orderId") Integer orderId);
 }

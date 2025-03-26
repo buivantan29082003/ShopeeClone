@@ -14,9 +14,11 @@ import com.CloneShopee.DTO.Sale.OrderItemDTO;
 import com.CloneShopee.ExceptionGlobal.ConstraintException;
 import com.CloneShopee.models.Account;
 import com.CloneShopee.models.Order;
+import com.CloneShopee.models.Shop;
 import com.CloneShopee.repository.AccountRepository;
 import com.CloneShopee.repository.OrderItemRepository;
 import com.CloneShopee.repository.OrderRepository;
+import com.CloneShopee.repository.ShopRepository;
 import com.CloneShopee.repository.SpecificationBuilder.OrderSpecification;
 
 import co.elastic.clients.elasticsearch.ml.Page;
@@ -39,6 +41,9 @@ public class OrderService {
     OrderItemRepository orderItemRepo;
     @Autowired
     AccountRepository accountRepository;
+
+    @Autowired
+    ShopRepository shopRepo;
 
     public void fetchAccount(Set<Integer> accountIds, List<Order> orders) {
         List<Account> accounts = accountRepository.getInfoAccountInIds(accountIds);

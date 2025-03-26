@@ -6,9 +6,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.boot.beanvalidation.IntegrationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.CloneShopee.Bean.ShopBean;
@@ -27,7 +29,9 @@ import com.CloneShopee.repository.CartItemRepository;
 import com.CloneShopee.repository.OrderItemRepository;
 import com.CloneShopee.repository.OrderRepository;
 import com.CloneShopee.repository.PromotionItemRepository;
+import com.CloneShopee.repository.ShopRepository;
 import com.CloneShopee.repository.VoucherRepository;
+import com.CloneShopee.repository.SpecificationBuilder.OrderSpecification;
 
 @Service
 public class UserOrderService {
@@ -49,8 +53,31 @@ public class UserOrderService {
     @Autowired
     OrderItemRepository orderItemRepo;
 
+    @Autowired
+    ShopRepository shopRepo;
+
+    public List<com.CloneShopee.DTO.Sale.OrderItemDTO> getOrderItemByOrderId(Integer orderId) {
+        return orderRepo.getOrderItemsByOrderId(orderId);
+    }
+
     public List<OrderItemDTO> generationOrderInListIds(List<Integer> ids, Integer accountId) {
         return cartItemRepo.getInfoCartForAddOrder(ids, accountId);
+    }
+
+    public org.springframework.data.domain.Page<Order> getAllOrder(Integer accountId, Integer statusId,
+            Integer paymentId,
+            org.springframework.data.domain.Pageable page) {
+        Specification<Order> specification = OrderSpecification.filterByAccountId(accountId, statusId, paymentId);
+        return orderRepo.findAll(specification, page);
+    }
+
+    public void fetchShop(Set<Integer> shopIds, List<Order> orders) {
+        List<Shop> accounts = shopRepo.getShopInList(shopIds);
+        Map<Integer, Shop> shopMap = accounts.stream()
+                .collect(Collectors.toMap(Shop::getId, account -> account));
+        orders.forEach(v -> {
+            v.setShop(shopMap.get(v.getAccount().getId()));
+        });
     }
 
     public List<PromotionProjection> getPromotionInListProductIds(List<Integer> ids) {
@@ -161,6 +188,10 @@ public class UserOrderService {
                 break;
         }
         return voucher;
+    }
+
+    public Integer checkOrderOfUser(Integer accountId, Integer orderId) {
+        return orderRepo.getOrderByAccountIdAndOrderId(accountId, orderId).orElse(null);
     }
 
     public void saveOrder(List<Order> orders, List<OrderItem> orderItems) {

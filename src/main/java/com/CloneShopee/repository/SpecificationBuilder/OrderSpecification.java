@@ -32,4 +32,20 @@ public class OrderSpecification {
         };
     }
 
+    public static Specification<Order> filterByAccountId(Integer accountId, Integer statusId, Integer paymentId) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (statusId != -1) {
+                predicates.add(criteriaBuilder.equal(root.get("status").get("id"), statusId));
+            }
+            if (paymentId != -1) {
+                predicates.add(criteriaBuilder.equal(root.get("payment").get("id"), paymentId));
+            }
+            predicates.add(criteriaBuilder.equal(root.get("account").get("id"), accountId));
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
 }

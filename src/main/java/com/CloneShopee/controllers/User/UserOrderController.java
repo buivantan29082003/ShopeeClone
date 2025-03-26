@@ -6,13 +6,20 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.CloneShopee.Bean.ShopBean;
+import com.CloneShopee.DTO.Sale.OrderInfo;
+import com.CloneShopee.DTO.User.OrderInfoUser;
 import com.CloneShopee.DTO.User.OrderInsertDTO;
 import com.CloneShopee.DTO.User.OrderItemDTO;
 import com.CloneShopee.ResponeEntity.BaseRespone;
@@ -34,6 +41,36 @@ public class UserOrderController {
     UserOrderService orderService;
     @Autowired
     ShopBean shopBean;
+
+    @GetMapping("/user/order/order-items")
+    public ResponseEntity<Object> getOrderItemByOrderId(
+            @RequestParam(name = "orderId", defaultValue = "01") Integer orderId) {
+        Integer isOfShop = orderService.checkOrderOfUser(shopBean.getAccount().getId(), orderId);
+        if (isOfShop != null) {
+            List<com.CloneShopee.DTO.Sale.OrderItemDTO> orderItems = orderService.getOrderItemByOrderId(orderId);
+            return new ResponseEntity<>(new BaseRespone(orderItems, "success!!!"),
+                    HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new BaseRespone(null, "Không tìm thấy đơn hàng của bạn !!!"),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("user/order/findall")
+    public ResponseEntity<Object> getAllOrder(@RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(name = "statusId", defaultValue = "-1") Integer statusId,
+            @RequestParam(name = "paymentId", defaultValue = "-1") Integer paymentId) {
+        Pageable pageSearch = PageRequest.of(page, pageSize);
+        Page<Order> data = orderService.getAllOrder(shopBean.getAccount().getId(), statusId, paymentId, pageSearch);
+        List<OrderInfoUser> orders = new ArrayList<OrderInfoUser>();
+        orderService.fetchShop(
+                data.getContent().stream().map(order -> order.getShop().getId()).collect(Collectors.toSet()),
+                data.getContent());
+        data.forEach(v -> {
+            orders.add(new OrderInfoUser(v));
+        });
+        return new ResponseEntity<>(orders, HttpStatus.OK);
+    }
 
     @Transactional
     @PostMapping("user/order/add")
