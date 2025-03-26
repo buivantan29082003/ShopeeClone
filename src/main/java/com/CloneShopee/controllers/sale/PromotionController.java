@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.CloneShopee.Bean.ShopBean;
 import com.CloneShopee.DTO.Sale.Promotion.PromotionInsert;
+import com.CloneShopee.ResponeEntity.BaseRespone;
 import com.CloneShopee.models.Promotion;
 import com.CloneShopee.models.PromotionCombo;
 import com.CloneShopee.models.PromotionComboOption;
@@ -98,6 +99,27 @@ public class PromotionController {
                                 shopbean.getShop().getId());
                 promotionService.updatePromotion(promotion.getPromotion());
                 return new ResponseEntity<>(null, HttpStatus.OK);
+        }
+
+        @PostMapping("/sale/promotion/change-status")
+        public ResponseEntity<BaseRespone> changeStatusPromotion(
+                        @RequestParam(name = "promotionId", defaultValue = "-1") Integer promotionId,
+                        @RequestParam(name = "statusNumber", defaultValue = "1") Integer statusNumber) {
+                if (statusNumber != 0 || statusNumber != 1) {
+                        return new ResponseEntity(new BaseRespone(null, "Trạng thái cập nhật không hợp lệ !!!"),
+                                        HttpStatus.BAD_REQUEST);
+                }
+                Integer promotion = promotionService.getPromotionByIdAndShopId(promotionId, shopbean.getShop().getId());
+                if (promotion != null) {
+                        Integer isUpdated = promotionService.changeStatusPromotion(promotionId, 1);
+                        if (isUpdated == 1) {
+                                return new ResponseEntity(new BaseRespone(null, "Thay đổi trạng thái thành công!!!"),
+                                                HttpStatus.OK);
+                        }
+                        return new ResponseEntity(new BaseRespone(null, "Nó bị  !!!"), HttpStatus.BAD_REQUEST);
+                }
+                return new ResponseEntity(new BaseRespone(null, "Không tìm thấy promotion !!!"),
+                                HttpStatus.BAD_REQUEST);
         }
 
 }

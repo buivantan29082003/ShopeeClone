@@ -127,6 +127,14 @@ public class PromotionService {
         promotionItemRepo.saveAll(promotionItems);
     }
 
+    public Integer getPromotionByIdAndShopId(Integer promotionId, Integer shopId) {
+        return promotionRepo.getPromotionByIdAndShopId(promotionId, shopId).orElse(null);
+    }
+
+    public Integer changeStatusPromotion(Integer promotionId, Integer statusNumber) {
+        return promotionRepo.updateStatusPromotion(promotionId, statusNumber);
+    }
+
     public void checkProductOfShop(Set<Integer> products, Integer shopId) {
         if (productRepo.countProductInListAndOfShop(products, shopId) != products.size()) {
             throw new ConstraintException("products", "Product is not valid");

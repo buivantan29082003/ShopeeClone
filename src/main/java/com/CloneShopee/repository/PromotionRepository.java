@@ -1,7 +1,9 @@
 package com.CloneShopee.repository;
 
+import java.lang.foreign.Linker.Option;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,12 +20,9 @@ import com.CloneShopee.models.PromotionComboOption;
 @Repository
 public interface PromotionRepository extends JpaRepository<Promotion, Integer> {
 
-        // SELECT
-        // ========================================================================================================
-
-        // @Query("SELECT new String() FROM PromotionItem pi ")
-        // List<String> getPromotionOfProduct(@Param("products") List<Product>
-        // products);
+        @Query("SELECT p.id FROM Promotion p where p.id=:promotionId and p.shop.id=:shopId")
+        Optional<Integer> getPromotionByIdAndShopId(@Param("promotionId") Integer promotionId,
+                        @Param("shopId") Integer shopId);
 
         @Query("SELECT new com.CloneShopee.DTO.User.PromotionInProductSearch(p.promotion.PromotionName,p.promotion.signature,p.promotion.promotionType,p.product.id) from PromotionItem p where p.product in :products")
         List<PromotionInProductSearch> getPromotionInfoInListProduct(List<Product> products);
@@ -38,6 +37,11 @@ public interface PromotionRepository extends JpaRepository<Promotion, Integer> {
                         @Param("promotionType") String promotionType);
 
         @Modifying
+        @Query("UPDATE Promotion p SET p.isActive=:statusNumber WHERE p.id=:promotionId")
+        Integer updateStatusPromotion(@Param("promotionId") Integer promotionId,
+                        @Param("statusNumber") Integer statusNumber);
+
+        @Modifying
         @Query("Delete Promotion p where p.id=:id and now()< p.startDate AND p.shop.id=:shopId")
         Integer deletePromotion(@Param("id") Integer promotionId, @Param("shopId") Integer shopId);
 
@@ -49,8 +53,3 @@ public interface PromotionRepository extends JpaRepository<Promotion, Integer> {
         Set<Integer> getSetProductIdInPromotionItem(@Param("id") Integer id);
 
 }
-
-// SELECT COUNT(p.id) from Promotion p JOIN PromotionItem pi on
-// p.id=pi.promotion.id WHERE pi.product.id IN:productIds
-// AND p.promotionType=:promotionType AND (:startDate<p.startDate and
-// :endDate>p.startDate or :startDate)
