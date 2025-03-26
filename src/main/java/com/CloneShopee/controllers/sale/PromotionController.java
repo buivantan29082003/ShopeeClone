@@ -101,17 +101,18 @@ public class PromotionController {
                 return new ResponseEntity<>(null, HttpStatus.OK);
         }
 
+        @Transactional
         @PostMapping("/sale/promotion/change-status")
         public ResponseEntity<BaseRespone> changeStatusPromotion(
                         @RequestParam(name = "promotionId", defaultValue = "-1") Integer promotionId,
                         @RequestParam(name = "statusNumber", defaultValue = "1") Integer statusNumber) {
-                if (statusNumber != 0 || statusNumber != 1) {
+                if (statusNumber != 0 && statusNumber != 1) {
                         return new ResponseEntity(new BaseRespone(null, "Trạng thái cập nhật không hợp lệ !!!"),
                                         HttpStatus.BAD_REQUEST);
                 }
                 Integer promotion = promotionService.getPromotionByIdAndShopId(promotionId, shopbean.getShop().getId());
                 if (promotion != null) {
-                        Integer isUpdated = promotionService.changeStatusPromotion(promotionId, 1);
+                        Integer isUpdated = promotionService.changeStatusPromotion(promotionId, statusNumber);
                         if (isUpdated == 1) {
                                 return new ResponseEntity(new BaseRespone(null, "Thay đổi trạng thái thành công!!!"),
                                                 HttpStatus.OK);

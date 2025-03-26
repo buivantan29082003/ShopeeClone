@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,10 +17,17 @@ import com.CloneShopee.DTO.Sale.OrderInfo;
 import com.CloneShopee.DTO.Sale.OrderItemDTO;
 import com.CloneShopee.models.Order;
 
-public interface OrderRepository extends JpaRepository<Order, Integer> {
+public interface OrderRepository extends JpaRepository<Order, Integer>, JpaSpecificationExecutor<Order> {
 
-       @Query("SELECT p.id as id,p.status as status, p.payment as payment,p.createdDate as createdDate,p.totalAmount as totalAmount,p.fullAddress as fullAddress,p.account.id as accountId,p.account.fullName  as accountFullName FROM Order p")
-       List<OrderInfo> getOrderInfos();
+       // @Query("SELECT p.id as id,p.status as status, p.payment as
+       // payment,p.createdDate as createdDate,p.totalAmount as
+       // totalAmount,p.fullAddress as fullAddress,p.account.id as
+       // accountId,p.account.fullName as accountFullName FROM Order p where
+       // p.shop.id=:shopId and (:statusId=-1 or :statusId=p.status.id) and
+       // (:paymentId=-1 or :paymentId=p.payment.id)")
+       // Page<OrderInfo> getOrderInfos(@Param("shopId") Integer shopId, Integer
+       // statusId, Integer paymentId,
+       // Pageable page);
 
        @Query("""
                          SELECT p.id as id,
@@ -71,4 +80,3 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                      @Param("accountId") Integer accountId);
 
 }
-

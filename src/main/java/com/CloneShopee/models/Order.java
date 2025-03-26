@@ -3,7 +3,10 @@ package com.CloneShopee.models;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,6 +19,8 @@ import jakarta.persistence.TemporalType;
 
 @Entity
 @Table(name = "Orders")
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" }) // ✅ Ignore Proxy của Hibernate
+
 public class Order {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +30,7 @@ public class Order {
 	@ManyToOne
 	@JoinColumn(name = "accountId")
 	private Account account;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "voucherShopId")
 	private VoucherShop voucherShop;
 	private Double totalAmount = 0.0;
@@ -33,13 +38,13 @@ public class Order {
 	private Double shipFee;
 	private String fullAddress;
 	private String reasonCancel;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "shopId")
 	private Shop shop;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "paymentId")
 	private Payment payment;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "statusId")
 	private Status status;
 	private String tag;
